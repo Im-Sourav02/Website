@@ -1,0 +1,140 @@
+[00:00:00.765] Server  LOG     ✓ Ready in 499ms
+[00:00:05.891] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:06.053] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html
+                          lang="en"
+-                         data-darkreader-mode="dynamic"
+-                         data-darkreader-scheme="dark"
+-                         data-darkreader-proxy-injected="true"
+                        >
+                          <body className="min-h-scre...">
+                            ...
+                              <a className="flex items..." ref={function} onClick={function onClick} ...>
+                                <div className="bg-[#3b82f...">
+                                  <Shield>
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width={24}
+                                      height={24}
+                                      viewBox="0 0 24 24"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth={2}
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      className="lucide lucide-shield w-5 h-5 text-white"
+-                                     data-darkreader-inline-stroke=""
+-                                     style={{--darkreader-inline-stroke:"currentColor"}}
+                                    >
+                                ...
+                            ...
+                              <Home>
+                                <div className="flex flex-...">
+                                  ...
+                                    <LinkComponent>
+                                      <LinkComponent href="/docs" className="px-8 py-4 ...">
+                                        <a className="px-8 py-4 ..." ref={function} onClick={function onClick} ...>
+                                          <ArrowRight>
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              width={24}
+                                              height={24}
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth={2}
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              className="lucide lucide-arrow-right w-5 h-5 group-hover:translate-x-1 t..."
+-                                             data-darkreader-inline-stroke=""
+-                                             style={{--darkreader-inline-stroke:"currentColor"}}
+                                            >
+                                  ...
+                                    <div className="grid md:gr...">
+                                      <div className="glass-card...">
+                                        <div className="p-3 bg-blu...">
+                                          <Zap>
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              width={24}
+                                              height={24}
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth={2}
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              className="lucide lucide-zap w-8 h-8 text-blue-400"
+-                                             data-darkreader-inline-stroke=""
+-                                             style={{--darkreader-inline-stroke:"currentColor"}}
+                                            >
+                                        ...
+                                      <div className="glass-card...">
+                                        <div className="p-3 bg-gre...">
+                                          <ShieldCheck>
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              width={24}
+                                              height={24}
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth={2}
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              className="lucide lucide-shield-check w-8 h-8 text-green-400"
+-                                             data-darkreader-inline-stroke=""
+-                                             style={{--darkreader-inline-stroke:"currentColor"}}
+                                            >
+                                        ...
+                                      <div className="glass-card...">
+                                        <div className="p-3 bg-blu...">
+                                          <Shield>
+                                            <svg
+                                              xmlns="http://www.w3.org/2000/svg"
+                                              width={24}
+                                              height={24}
+                                              viewBox="0 0 24 24"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              strokeWidth={2}
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              className="lucide lucide-shield w-8 h-8 text-blue-400"
+-                                             data-darkreader-inline-stroke=""
+-                                             style={{--darkreader-inline-stroke:"currentColor"}}
+                                            >
+                                        ...
+                            ...
+                  ...
+
+[00:04:25.371] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:04:45.718] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
