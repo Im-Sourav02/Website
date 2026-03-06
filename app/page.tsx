@@ -1,8 +1,19 @@
 import Link from 'next/link';
 import { ArrowRight, Zap, ShieldCheck, Shield } from 'lucide-react';
+import RedirectEngine from '@/components/RedirectEngine';
 
+type Props = {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
 
-export default function Home() {
+export default async function Home(props: Props) {
+    const searchParams = await props.searchParams;
+    const to = typeof searchParams?.to === 'string' ? searchParams.to : undefined;
+
+    if (to) {
+        return <RedirectEngine target={to} />;
+    }
+
     return (
         <div className="flex flex-col items-center flex-1">
             {/* Hero Section */}
