@@ -15,7 +15,13 @@ export default function RedirectEngine({ target }: { target: string }) {
             isAndroid = /android/.test(ua);
         }
 
-        const decodedTarget = decodeURIComponent(target);
+        let decodedTarget = target;
+        try {
+            decodedTarget = atob(target);
+        } catch (e) {
+            console.error("Failed to decode base64 target", e);
+        }
+
         const parsedUrl = decodedTarget.replace(/^https?:\/\//, '');
 
         const tick = setInterval(() => {
@@ -45,7 +51,12 @@ export default function RedirectEngine({ target }: { target: string }) {
         return () => clearInterval(tick);
     }, [target]);
 
-    const decodedTarget = typeof window !== "undefined" ? decodeURIComponent(target) : target;
+    let displayTarget = target;
+    try {
+        displayTarget = atob(target);
+    } catch (e) {
+        // Fallback to original if decode fails
+    }
 
     return (
         <div className="flex flex-col items-center justify-center flex-1 w-full px-4 min-h-[80vh]">
@@ -70,7 +81,7 @@ export default function RedirectEngine({ target }: { target: string }) {
                         <div className="flex items-center gap-3 overflow-hidden w-full">
                             <ShieldCheck className="w-5 h-5 text-green-400 flex-shrink-0" />
                             <span className="text-sm text-gray-300 truncate font-mono">
-                                {decodedTarget}
+                                {displayTarget}
                             </span>
                         </div>
                     </div>
@@ -84,7 +95,7 @@ export default function RedirectEngine({ target }: { target: string }) {
                     </div>
 
                     <a
-                        href={decodedTarget}
+                        href={displayTarget}
                         className="mt-6 flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 transition-colors font-medium cursor-pointer"
                     >
                         Click here if not redirected
