@@ -13,21 +13,23 @@ export async function POST(request: Request) {
 
     // 1. Secretly verify the Turnstile Token with Cloudflare
     const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-    const formData = new URLSearchParams();
-
-    // PASTE YOUR CLOUDFLARE SECRET KEY HERE
-    formData.append('secret', process.env.TURNSTILE_SECRET_KEY || '');
-    formData.append('response', token);
 
     const cfResponse = await fetch(verifyUrl, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${token}`,
     });
     const cfData = await cfResponse.json();
 
-    // If Cloudflare rejects the token, block the redirect
+    // If Cloudflare rejects the token, block the redirect and expose the specific error codes
     if (!cfData.success) {
-      return NextResponse.json({ success: false, error: 'Bot detected' }, { status: 403 });
+      return NextResponse.json({
+        success: false,
+        error: 'Cloudflare rejected token',
+        codes: cfData['error-codes']
+      }, { status: 403 });
     }
 
     // 2. If verified as human, safely decode the Base64 link on the server

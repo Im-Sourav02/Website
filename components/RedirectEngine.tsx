@@ -35,7 +35,13 @@ export default function RedirectEngine({ target }: { target: string }) {
             } else {
                 console.error("Turnstile verification failed:", data);
                 setStep("error");
-                setErrorMsg(data.error || "Verification Failed - Invalid Token");
+
+                // If Cloudflare returns explicit error codes, format and display them
+                if (data.codes && Array.isArray(data.codes)) {
+                    setErrorMsg(`Verification Failed - ${data.codes.join(', ')}`);
+                } else {
+                    setErrorMsg(data.error || "Verification Failed - Invalid Token");
+                }
             }
         } catch (error) {
             console.error("Error during Turnstile verification:", error);
