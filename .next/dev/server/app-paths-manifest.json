@@ -1,0 +1,5 @@
+{
+  "/api/redirect/route": "app/api/redirect/route.js",
+  "/api/verify-turnstile/route": "app/api/verify-turnstile/route.js",
+  "/page": "app/page.js"
+}

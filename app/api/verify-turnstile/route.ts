@@ -13,7 +13,7 @@ export async function POST(request: Request) {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `secret=${encodeURIComponent(process.env.TURNSTILE_SECRET_KEY || '')}&response=${encodeURIComponent(token)}`,
+            body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${token}`,
             cache: 'no-store'
         });
 
@@ -24,9 +24,9 @@ export async function POST(request: Request) {
         } else {
             return NextResponse.json({
                 success: false,
-                error: 'Verification failed',
-                details: verifyData['error-codes']
-            }, { status: 400 });
+                error: 'Cloudflare rejected token',
+                codes: verifyData['error-codes']
+            }, { status: 403 });
         }
     } catch (error) {
         console.error('Turnstile verification error:', error);

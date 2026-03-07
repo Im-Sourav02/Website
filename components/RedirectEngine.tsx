@@ -14,7 +14,7 @@ export default function RedirectEngine({ target }: { target: string }) {
     // 1. Cloudflare Verification
     const handleVerify = async (token: string) => {
         try {
-            const res = await fetch("/api/verify-turnstile", {
+            const res = await fetch("/api/redirect", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 // Send BOTH token and base64 target to the server
