@@ -1,62 +1,163 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck, ExternalLink } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Lock, Zap, Check, Bot, Timer, ArrowUpRight, Loader2, ShieldCheck, ExternalLink } from "lucide-react";
+import Turnstile from "react-turnstile";
 
 export default function RedirectEngine({ target }: { target: string }) {
+    const [step, setStep] = useState<"loading" | "intent" | "verifying" | "countdown" | "redirecting">("loading");
     const [countdown, setCountdown] = useState(3);
-    const [status, setStatus] = useState("Analyzing request...");
+    const [displayTarget, setDisplayTarget] = useState("");
 
-    useEffect(() => {
-        let isAndroid = false;
-
-        if (typeof window !== "undefined") {
-            const ua = navigator.userAgent.toLowerCase();
-            isAndroid = /android/.test(ua);
-        }
-
-        let decodedTarget = target;
+    // React Turnstile configuration and verification
+    const handleVerify = async (token: string) => {
         try {
-            decodedTarget = atob(target);
-        } catch (e) {
-            console.error("Failed to decode base64 target", e);
+            const res = await fetch("/api/verify-turnstile", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                startCountdown();
+            } else {
+                console.error("Turnstile verification failed:", data);
+                // Handle failure (e.g., set step to an error state or reset Turnstile)
+            }
+        } catch (error) {
+            console.error("Error during Turnstile verification:", error);
         }
+    };
 
-        const parsedUrl = decodedTarget.replace(/^https?:\/\//, '');
+    const startCountdown = () => {
+        if (stepRef.current !== "verifying" && stepRef.current !== "intent") return;
+        setStep("countdown");
 
-        const tick = setInterval(() => {
+        const timer = setInterval(() => {
             setCountdown((prev) => {
                 if (prev <= 1) {
-                    clearInterval(tick);
-                    setStatus("Redirecting...");
-
-                    if (isAndroid) {
-                        // Android intent fallback to force native browser instead of webview
-                        const intentUrl = `intent://${parsedUrl}#Intent;scheme=https;package=com.android.chrome;end`;
-                        window.location.href = intentUrl;
-
-                        // Fallback if intent fails
-                        setTimeout(() => {
-                            window.location.href = decodedTarget;
-                        }, 1000);
-                    } else {
-                        window.location.href = decodedTarget;
-                    }
+                    clearInterval(timer);
+                    window.location.replace(atob(target));
                     return 0;
                 }
                 return prev - 1;
             });
         }, 1000);
 
-        return () => clearInterval(tick);
+        tickRef.current = timer;
+    };
+
+    const stepRef = useRef(step);
+    useEffect(() => {
+        stepRef.current = step;
+    }, [step]);
+
+    const tickRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        let isAndroid = false;
+        let isRealChrome = true;
+        let forceChrome = false;
+
+        if (typeof window !== "undefined") {
+            const ua = navigator.userAgent.toLowerCase();
+            isAndroid = /android/.test(ua);
+
+            // Check for Brave and other webviews/non-chrome browsers
+            const isBrave = (navigator as any).brave !== undefined;
+            isRealChrome = /chrome/.test(ua) && !/wv|fbav|instagram|messenger|snapchat|line|viber|kakao|tiktok|edg|opr/.test(ua) && !isBrave;
+
+            const params = new URLSearchParams(window.location.search);
+            forceChrome = params.get('browser') === 'chrome';
+
+            // Decode target payload
+            let decoded = target;
+            try {
+                decoded = atob(target);
+            } catch (e) {
+                console.error("Failed to decode base64 target", e);
+            }
+
+            // Extract domain for display
+            try {
+                const urlObj = new URL(decoded);
+                setDisplayTarget(urlObj.hostname.replace(/^www\./, ''));
+            } catch {
+                setDisplayTarget(decoded.replace(/^https?:\/\//, '').split('/')[0]);
+            }
+
+            // 1. & 2. The Intent Target & Breakout Check
+            if (isAndroid && !isRealChrome && !forceChrome) {
+                setStep("intent");
+
+                // Append browser=chrome to current URL instead of final target
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('browser', 'chrome');
+
+                // Construct the intent URL
+                const intentTarget = currentUrl.toString().replace(/^https?:\/\//, '');
+                const intentUrl = `intent://${intentTarget}#Intent;scheme=https;package=com.android.chrome;end;`;
+
+                // Fire intent
+                window.location.replace(intentUrl);
+
+                // 3. Halt execution (Brave Fix)
+                return;
+            }
+
+            // Normal flow starts at verifying, and now Turnstile component handles the delay/validation
+            setStep("verifying");
+
+            return () => {
+                if (tickRef.current) clearInterval(tickRef.current);
+            };
+        }
     }, [target]);
 
-    let displayTarget = target;
-    try {
-        displayTarget = atob(target);
-    } catch (e) {
-        // Fallback to original if decode fails
-    }
+    const getIconAndText = () => {
+        switch (step) {
+            case "loading":
+                return {
+                    icon: <Zap className="w-10 h-10 text-blue-400 animate-pulse" />,
+                    title: "Initializing...",
+                    description: "Preparing your secure connection.",
+                };
+            case "intent":
+                return {
+                    icon: <ArrowUpRight className="w-10 h-10 text-green-400 animate-bounce" />,
+                    title: "Opening External Browser...",
+                    description: "Please confirm to open in your default browser for a secure experience.",
+                };
+            case "verifying":
+                return {
+                    icon: <Bot className="w-10 h-10 text-purple-400 animate-bounce" />,
+                    title: "Verifying Access...",
+                    description: "Please complete the security check to proceed.",
+                };
+            case "countdown":
+                return {
+                    icon: <Timer className="w-10 h-10 text-yellow-400 animate-pulse" />,
+                    title: "Redirecting Soon...",
+                    description: "Your secure redirect will begin shortly.",
+                };
+            case "redirecting":
+                return {
+                    icon: <Check className="w-10 h-10 text-green-400" />,
+                    title: "Redirecting...",
+                    description: "You are being securely redirected.",
+                };
+            default:
+                return {
+                    icon: <Lock className="w-10 h-10 text-gray-400" />,
+                    title: "Secure Redirect",
+                    description: "Ensuring a safe journey to your destination.",
+                };
+        }
+    };
+
+    const { icon, title, description } = getIconAndText();
 
     return (
         <div className="flex flex-col items-center justify-center flex-1 w-full px-4 min-h-[80vh]">
