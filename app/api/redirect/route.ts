@@ -1,5 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// import { NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
+    try {
+        const body = await request.json();
+        const { token, target } = body;
+
+        if (!token || !target) {
+            return NextResponse.json({ success: false, error: 'Missing data' }, { status: 400 });
+        }
+
+        // 1. Secretly verify the Turnstile Token with Cloudflare
+        const verifyUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+        const formData = new URLSearchParams();
+        
+        // PASTE YOUR CLOUDFLARE SECRET KEY HERE
+        formData.append('secret', 'TURNSTILE_SECRET_KEY'); 
+        formData.append('response', token);
+
+        const cfResponse = await fetch(verifyUrl, {
+            method: 'POST',
+            body: formData,
+        });
+        const cfData = await cfResponse.json();
+
+        // If Cloudflare rejects the token, block the redirect
+        if (!cfData.success) {
+            return NextResponse.json({ success: false, error: 'Bot detected' }, { status: 403 });
+        }
+
+        // 2. If verified as human, safely decode the Base64 link on the server
+        const decodedUrl = Buffer.from(target, 'base64').toString('utf-8');
+
+        // 3. Send the real URL back to the frontend safely
+        return NextResponse.json({ success: true, url: decodedUrl });
+
+    } catch (error) {
+        return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
+    }
+}
+
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
   const encodedTarget = url.searchParams.get('to');
