@@ -28,7 +28,7 @@ var _s = __turbopack_context__.k.signature();
 function RedirectEngine({ target }) {
     _s();
     const [step, setStep] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("loading");
-    const [countdown, setCountdown] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(3);
+    const [countdown, setCountdown] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(1);
     const [displayTarget, setDisplayTarget] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Protected Destination");
     const [realUrl, setRealUrl] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [errorMsg, setErrorMsg] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
@@ -72,7 +72,7 @@ function RedirectEngine({ target }) {
     };
     const startCountdown = (finalUrl)=>{
         setStep("countdown");
-        let timeLeft = 3;
+        let timeLeft = 1;
         setCountdown(timeLeft);
         const timer = setInterval(()=>{
             timeLeft -= 1;
@@ -396,7 +396,7 @@ function RedirectEngine({ target }) {
         columnNumber: 9
     }, this);
 }
-_s(RedirectEngine, "1aOsqxzvaJIPHaRDqfymHT5mzrI=");
+_s(RedirectEngine, "Gi5F6lUf92D8IllRvxw3UHrpj/Y=");
 _c = RedirectEngine;
 var _c;
 __turbopack_context__.k.register(_c, "RedirectEngine");

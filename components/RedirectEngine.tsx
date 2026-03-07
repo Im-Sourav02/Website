@@ -6,7 +6,7 @@ import Turnstile from "react-turnstile";
 
 export default function RedirectEngine({ target }: { target: string }) {
     const [step, setStep] = useState<"loading" | "intent" | "verifying" | "countdown" | "redirecting" | "error">("loading");
-    const [countdown, setCountdown] = useState(3);
+    const [countdown, setCountdown] = useState(1);
     const [displayTarget, setDisplayTarget] = useState("Protected Destination");
     const [realUrl, setRealUrl] = useState<string | null>(null);
     const [errorMsg, setErrorMsg] = useState<string>("");
@@ -50,7 +50,7 @@ export default function RedirectEngine({ target }: { target: string }) {
 
     const startCountdown = (finalUrl: string) => {
         setStep("countdown");
-        let timeLeft = 3;
+        let timeLeft = 1;
         setCountdown(timeLeft);
 
         const timer = setInterval(() => {
