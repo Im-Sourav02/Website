@@ -5,10 +5,11 @@ import { Lock, Zap, Check, Bot, Timer, ArrowUpRight, Loader2, ShieldCheck, Exter
 import Turnstile from "react-turnstile";
 
 export default function RedirectEngine({ target }: { target: string }) {
-    const [step, setStep] = useState<"loading" | "intent" | "verifying" | "countdown" | "redirecting">("loading");
+    const [step, setStep] = useState<"loading" | "intent" | "verifying" | "countdown" | "redirecting" | "error">("loading");
     const [countdown, setCountdown] = useState(3);
     const [displayTarget, setDisplayTarget] = useState("Protected Destination");
     const [realUrl, setRealUrl] = useState<string | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string>("");
 
     // 1. Cloudflare Verification
     const handleVerify = async (token: string) => {
@@ -17,7 +18,7 @@ export default function RedirectEngine({ target }: { target: string }) {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 // Send BOTH token and base64 target to the server
-                body: JSON.stringify({ token, target }), 
+                body: JSON.stringify({ token, target }),
             });
 
             const data = await res.json();
@@ -33,6 +34,8 @@ export default function RedirectEngine({ target }: { target: string }) {
                 startCountdown(data.url);
             } else {
                 console.error("Turnstile verification failed:", data);
+                setStep("error");
+                setErrorMsg(data.error || "Verification Failed - Invalid Token");
             }
         } catch (error) {
             console.error("Error during Turnstile verification:", error);
@@ -65,7 +68,7 @@ export default function RedirectEngine({ target }: { target: string }) {
 
         if (isAndroid && !forceChrome) {
             setStep("intent");
-            
+
             const currentUrl = new URL(window.location.href);
             currentUrl.searchParams.set('browser', 'chrome');
             const intentTarget = currentUrl.toString().replace(/^https?:\/\//, '');
@@ -96,6 +99,7 @@ export default function RedirectEngine({ target }: { target: string }) {
             case "verifying": return { icon: <Bot className="w-10 h-10 text-purple-400 animate-bounce" />, title: "Verifying Access...", description: "Please complete the security check to proceed." };
             case "countdown": return { icon: <Timer className="w-10 h-10 text-yellow-400 animate-pulse" />, title: "Redirecting Soon...", description: "Your secure redirect will begin shortly." };
             case "redirecting": return { icon: <Check className="w-10 h-10 text-green-400" />, title: "Redirecting...", description: "You are being securely redirected." };
+            case "error": return { icon: <Bot className="w-10 h-10 text-red-500" />, title: "Security Check Failed", description: errorMsg || "Invalid Token detected. Access Denied." };
             default: return { icon: <Lock className="w-10 h-10 text-gray-400" />, title: "Secure Redirect", description: "Ensuring a safe journey to your destination." };
         }
     };
@@ -121,8 +125,8 @@ export default function RedirectEngine({ target }: { target: string }) {
                     {/* TURNSTILE WIDGET (Only shows during verification step) */}
                     {step === "verifying" && (
                         <div className="mb-6 flex justify-center w-full min-h-[65px]">
-                            <Turnstile 
-                                sitekey="NEXT_PUBLIC_TURNSTILE_SITE_KEY" // PASTE SITE KEY HERE
+                            <Turnstile
+                                sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                                 onVerify={handleVerify}
                                 theme="dark"
                             />
@@ -141,7 +145,7 @@ export default function RedirectEngine({ target }: { target: string }) {
                     <div className="flex items-center gap-3 text-sm text-gray-400 font-medium">
                         <span>Redirecting in</span>
                         <span className="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-mono font-bold">
-                            {step === "verifying" || step === "intent" ? "..." : countdown}
+                            {step === "verifying" || step === "intent" || step === "error" ? "..." : countdown}
                         </span>
                         <span>seconds</span>
                     </div>
